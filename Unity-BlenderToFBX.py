@@ -25,7 +25,6 @@ else:
     for bone in bpy.context.object.pose.bones: #may need to make this a list first
         if dot in bone.name:
             bone.name = bone.name.replace(dot, dash)
-
 try:
     bpy.context.scene.objects
 except Exception:
@@ -53,11 +52,11 @@ try:
 except Exception:
     print ("no actions found")
 else:
-    for a in bpy.data.actions:
+    for action in bpy.data.actions:
         bpy.context.object.animation_data.nla_tracks.new()
         bpy.context.object.animation_data.nla_tracks[(len(bpy.context.object.animation_data.nla_tracks)-1)].name = action.name
         bpy.context.object.animation_data.nla_tracks[(len(bpy.context.object.animation_data.nla_tracks)-1)].strips.new(action.name,0,action)
-        for fcurve in bpy.data.actions[a.name].fcurves:
+        for fcurve in bpy.data.actions[action.name].fcurves:
             b = (str(fcurve.data_path))
             splitName = b.split("\"")
             try:

@@ -17,35 +17,59 @@ mtx4_x90n = Matrix.Rotation(-math.pi / 2.0, 4, 'X')
 dot = "."
 dash = "_"
 
-for bone in bpy.context.object.pose.bones: #may need to make this a list first
-    if dot in bone.name:
-        bone.name = bone.name.replace(dot, dash)
+try:
+    bpy.context.object.pose.bones
+except Exception:
+    print ("no pose bones found")
+else:
+    for bone in bpy.context.object.pose.bones: #may need to make this a list first
+        if dot in bone.name:
+            bone.name = bone.name.replace(dot, dash)
 
-#rename fcurve
-for a in bpy.data.actions:
-    for fcurve in bpy.data.actions[a.name].fcurves:
-        b = (str(fcurve.data_path))
-        splitName = b.split("\"")
-        try:
-            splitName[1]
-        except Exception:
-            print ("splitName[1] not found, no problem tho")
-        else:
-            if dot in splitName[1]:
-                rename = (splitName[1].replace(dot, dash))
-                name = splitName[0] + "\"" + rename + "\"" + splitName[2]
-                print (name)
-                fcurve.data_path=name #rename
-                
+try:
+    bpy.context.scene.objects
+except Exception:
+    print ("no objects found")
+else:
+    for object in bpy.context.scene.objects:
+        if dot in object.name:
+            object.name = object.name.replace(dot, dash)
+        for m in object.modifiers:
+            m.show_render = m.show_viewport
+            if m.type == 'SUBSURF':
+                m.levels = m.render_levels
 
 #add actions to nla editor to export without rig name prefix
-for nlatrack in bpy.context.object.animation_data.nla_tracks:
-    bpy.context.object.animation_data.nla_tracks.remove(nlatrack)
+try:
+    bpy.context.object.animation_data.nla_tracks
+except Exception:
+    print ("no actions found")
+else:
+    for nlatrack in bpy.context.object.animation_data.nla_tracks:
+        bpy.context.object.animation_data.nla_tracks.remove(nlatrack)
 
-for action in bpy.data.actions:    
-    bpy.context.object.animation_data.nla_tracks.new()
-    bpy.context.object.animation_data.nla_tracks[(len(bpy.context.object.animation_data.nla_tracks)-1)].name = action.name
-    bpy.context.object.animation_data.nla_tracks[(len(bpy.context.object.animation_data.nla_tracks)-1)].strips.new(action.name,0,action)
+try:
+    bpy.data.actions
+except Exception:
+    print ("no actions found")
+else:
+    for a in bpy.data.actions:
+        bpy.context.object.animation_data.nla_tracks.new()
+        bpy.context.object.animation_data.nla_tracks[(len(bpy.context.object.animation_data.nla_tracks)-1)].name = action.name
+        bpy.context.object.animation_data.nla_tracks[(len(bpy.context.object.animation_data.nla_tracks)-1)].strips.new(action.name,0,action)
+        for fcurve in bpy.data.actions[a.name].fcurves:
+            b = (str(fcurve.data_path))
+            splitName = b.split("\"")
+            try:
+                splitName[1]
+            except Exception:
+                print ("splitName[1] not found, no problem tho")
+            else:
+                if dot in splitName[1]:
+                    rename = (splitName[1].replace(dot, dash))
+                    name = splitName[0] + "\"" + rename + "\"" + splitName[2]
+                    print (name)
+                    fcurve.data_path=name #rename
 
 print("moo")
 
